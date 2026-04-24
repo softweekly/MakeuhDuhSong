@@ -14,7 +14,15 @@ A comprehensive creative tool for writing parody songs with AI assistance, built
 See [ELEVENLABS_POLICY_COMPLIANCE.md](ELEVENLABS_POLICY_COMPLIANCE.md) for complete details.
 
 ## �🚀 Quick Start
+### 🆕 NEW USERS - Start Here!
+**First time using this tool?** Check out our comprehensive [**BEGINNER_GUIDE.md**](BEGINNER_GUIDE.md) for:
+- Complete setup walkthrough
+- API key configuration help
+- Step-by-step first parody creation
+- Troubleshooting common issues
+- Tips for great results
 
+### Experienced Users - Quick Setup
 ### 1. Install Dependencies
 ```bash
 pip install -r requirements.txt
