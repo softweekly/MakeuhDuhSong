@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="jumbotron gradient-bg rounded p-5 mb-4">
+            <h1 class="display-4"><i class="fas fa-microphone-alt"></i> Welcome to Parody Song Creator!</h1>
+            <p class="lead">Create hilarious parody songs with AI assistance. Write lyrics, generate music, and bring your comedy to life!</p>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.3);">
+            <a class="btn btn-light btn-lg" href="/create" role="button">
+                <i class="fas fa-rocket"></i> Start Creating
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <h2><i class="fas fa-folder-open"></i> Your Projects</h2>
+        <div id="projects-list">
+            <div class="text-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Loading projects...</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card card-hover">
+            <div class="card-header gradient-bg">
+                <h5><i class="fas fa-lightbulb"></i> Quick Tips</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Choose popular songs for better recognition</li>
+                    <li><i class="fas fa-check text-success"></i> Keep the original rhythm and flow</li>
+                    <li><i class="fas fa-check text-success"></i> Test your lyrics by singing along</li>
+                    <li><i class="fas fa-check text-success"></i> Focus on relatable, funny topics</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card card-hover mt-4">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-chart-line"></i> Features</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <i class="fas fa-brain fa-2x text-primary"></i>
+                        <p class="small mt-2">AI Lyric Assistant</p>
+                    </div>
+                    <div class="col-6">
+                        <i class="fas fa-music fa-2x text-success"></i>
+                        <p class="small mt-2">Music Generation</p>
+                    </div>
+                    <div class="col-6">
+                        <i class="fas fa-microphone fa-2x text-warning"></i>
+                        <p class="small mt-2">Vocal Guides</p>
+                    </div>
+                    <div class="col-6">
+                        <i class="fas fa-save fa-2x text-info"></i>
+                        <p class="small mt-2">Project Management</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Load projects
+$(document).ready(function() {
+    $.get('/api/projects')
+        .done(function(projects) {
+            let html = '';
+            
+            if (projects.length === 0) {
+                html = `
+                    <div class="text-center p-5">
+                        <i class="fas fa-music fa-3x text-muted mb-3"></i>
+                        <h4>No projects yet</h4>
+                        <p class="text-muted">Create your first parody song to get started!</p>
+                        <a href="/create" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Create Your First Parody
+                        </a>
+                    </div>
+                `;
+            } else {
+                projects.forEach(function(project) {
+                    html += `
+                        <div class="card card-hover mb-3">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-lg-8">
+                                        <h5 class="card-title">
+                                            <i class="fas fa-music text-primary"></i> ${project.title}
+                                        </h5>
+                                        <p class="text-muted mb-1">
+                                            <i class="fas fa-arrow-right"></i> Based on: ${project.original}
+                                        </p>
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar"></i> Created: ${project.created}
+                                        </small>
+                                    </div>
+                                    <div class="col-lg-4 text-end">
+                                        <a href="${project.url}" class="btn btn-outline-primary">
+                                            <i class="fas fa-eye"></i> View Project
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            $('#projects-list').html(html);
+        })
+        .fail(function() {
+            $('#projects-list').html(`
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    Could not load projects. Please check your setup.
+                </div>
+            `);
+        });
+});
+</script>
+{% endblock %}

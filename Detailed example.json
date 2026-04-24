@@ -1,0 +1,55 @@
+{
+  "title": "Midnight Signals",
+  "genre": "Synth-pop",
+  "tempo": 100,
+  "key": "A minor",
+  "mood": ["nostalgic", "melancholic", "late-night"],
+  "structure": [
+    "intro",
+    "verse",
+    "pre_chorus",
+    "chorus",
+    "verse",
+    "chorus",
+    "bridge",
+    "chorus",
+    "outro"
+  ],
+  "instrumentation": {
+    "drums": "soft electronic",
+    "bass": "analog synth",
+    "pads": "atmospheric",
+    "lead": "pluck synth"
+  },
+  "vocal": {
+    "style": "breathy, intimate",
+    "effects": ["reverb", "delay"],
+    "harmonies": true
+  },
+  "sections": {
+    "verse_1": {
+      "lyrics": [
+        "City lights are flickering in broken lines",
+        "Static whispers through the satellites",
+        "Driving slow with nowhere left to go",
+        "Just your voice on the radio"
+      ]
+    },
+    "pre_chorus": {
+      "lyrics": [
+        "And I know you're miles away",
+        "But it feels like yesterday",
+        "Every signal that I chase",
+        "Leads me back into your space"
+      ]
+    },
+    "chorus": {
+      "lyrics": [
+        "We were midnight signals in the dark",
+        "Burning bright but falling all apart",
+        "Every word we never got to say",
+        "Echoes through the static anyway"
+      ]
+    }
+  }
+}

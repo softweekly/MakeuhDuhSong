@@ -1,0 +1,920 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Parody - Parody Song Creator{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-plus-circle"></i> Create New Parody</h1>
+        <p class="text-muted">Let's turn your favorite song into a hilarious parody!</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Step 1: Original Song Info -->
+        <div class="card mb-4" id="step-1">
+            <div class="card-header gradient-bg">
+                <h4><i class="fas fa-info-circle"></i> Step 1: Original Song Information</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Original Song Title</label>
+                            <input type="text" class="form-control" id="original-title" placeholder="e.g., Bohemian Rhapsody">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Original Artist</label>
+                            <input type="text" class="form-control" id="original-artist" placeholder="e.g., Queen">
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Original Lyrics</label>
+                    <textarea class="form-control" id="original-lyrics" rows="8" 
+                              placeholder="Paste the original song lyrics here..."></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Parody Topic</label>
+                    <input type="text" class="form-control" id="parody-topic" 
+                           placeholder="What's your parody about? (e.g., working from home, cooking fails, etc.)">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label">Writing Mode</label>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check form-check-card">
+                                <input class="form-check-input" type="radio" name="writing-mode" id="ai-mode" value="ai" checked>
+                                <label class="form-check-label w-100" for="ai-mode">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-robot fa-2x text-primary mb-2"></i>
+                                            <h6>AI-Assisted Writing</h6>
+                                            <small class="text-muted">Let AI help generate parody lyrics</small>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-check-card">
+                                <input class="form-check-input" type="radio" name="writing-mode" id="manual-mode" value="manual">
+                                <label class="form-check-label w-100" for="manual-mode">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-pen fa-2x text-success mb-2"></i>
+                                            <h6>Manual Writing</h6>
+                                            <small class="text-muted">Write your own lyrics with structure guidance</small>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" id="analyze-btn">
+                    <i class="fas fa-search"></i> Analyze Song
+                    <span class="spinner-border spinner-border-sm ms-2 loading"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: Analysis Results -->
+        <div class="card mb-4 d-none" id="step-2">
+            <div class="card-header gradient-bg">
+                <h4><i class="fas fa-chart-bar"></i> Step 2: Song Analysis & Writing Options</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Song Structure</h5>
+                        <div id="song-structure"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Suggested Themes</h5>
+                        <div id="suggested-themes"></div>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <!-- AI Mode Content -->
+                <div id="ai-mode-content">
+                    <h5>Parody Ideas (AI-Generated)</h5>
+                    <div id="parody-ideas">
+                        <div class="text-center">
+                            <div class="spinner-border" role="status"></div>
+                            <p>Generating creative ideas...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3 d-none" id="idea-selection">
+                        <label class="form-label">Select an idea or enter your own:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="selected-concept" 
+                                   placeholder="Describe your parody concept...">
+                            <button class="btn btn-success" id="generate-lyrics-btn">
+                                <i class="fas fa-magic"></i> Generate Lyrics
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Manual Mode Content -->
+                <div id="manual-mode-content" class="d-none">
+                    <h5>Manual Writing Guide</h5>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        Use the song structure analysis above to guide your writing. Match the rhythm and rhyme patterns!
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Your Parody Concept</label>
+                        <input type="text" class="form-control" id="manual-concept" 
+                               placeholder="Briefly describe your parody idea...">
+                    </div>
+                    
+                    <button class="btn btn-success" id="start-manual-writing-btn">
+                        <i class="fas fa-pen"></i> Start Writing Lyrics
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Lyrics Creation -->
+        <div class="card mb-4 d-none" id="step-3">
+            <div class="card-header gradient-bg">
+                <h4><i class="fas fa-pen-alt"></i> Step 3: <span id="step3-title">Lyrics Creation</span></h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Original Lyrics <small class="text-muted">(Reference)</small></h5>
+                        <div class="bg-light p-3 rounded" style="max-height: 400px; overflow-y: auto;">
+                            <pre id="original-lyrics-display"></pre>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Your Parody Lyrics</h5>
+                        <textarea class="form-control" id="parody-lyrics" rows="15" 
+                                  placeholder="Your parody lyrics will appear here..."></textarea>
+                        
+                        <!-- Manual Writing Helper -->
+                        <div id="manual-writing-helper" class="mt-2 d-none">
+                            <small class="text-muted">
+                                💡 <strong>Tips:</strong> Match syllable counts, keep rhyme scheme, maintain rhythm
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Mode Refinement -->
+                <div id="ai-refinement-section" class="mt-3">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="refinement-feedback" 
+                               placeholder="Any changes needed? Describe what you'd like to improve...">
+                        <button class="btn btn-warning" id="refine-btn">
+                            <i class="fas fa-edit"></i> Refine with AI
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Manual Mode Tools -->
+                <div id="manual-tools-section" class="mt-3 d-none">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-info btn-sm" id="syllable-checker">
+                                    <i class="fas fa-calculator"></i> Check Syllables
+                                </button>
+                                <button type="button" class="btn btn-outline-info btn-sm" id="rhyme-helper">
+                                    <i class="fas fa-music"></i> Rhyme Suggestions
+                                </button>
+                                <button type="button" class="btn btn-outline-info btn-sm" id="structure-guide">
+                                    <i class="fas fa-list"></i> Structure Guide
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-info btn-sm" id="ai-assist-btn">
+                                <i class="fas fa-robot"></i> Get AI Suggestions
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <button class="btn btn-success" id="save-project-btn">
+                        <i class="fas fa-save"></i> Save Project
+                    </button>
+                    <button class="btn btn-info" id="generate-audio-btn" disabled>
+                        <i class="fas fa-volume-up"></i> Generate Audio
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Audio Generation -->
+        <div class="card mb-4 d-none" id="step-4">
+            <div class="card-header gradient-bg">
+                <h4><i class="fas fa-music"></i> Step 4: Advanced Audio Generation</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Music Generation Options -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5><i class="fas fa-music"></i> Backing Track Generator</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Music Options</h6>
+                                        <div class="mb-3">
+                                            <label class="form-label">Track Length</label>
+                                            <select class="form-control" id="music-length">
+                                                <option value="30">30 seconds</option>
+                                                <option value="60" selected>1 minute</option>
+                                                <option value="90">1.5 minutes</option>
+                                                <option value="120">2 minutes</option>
+                                                <option value="180">3 minutes</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Generation Method</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="generation-method" 
+                                                       id="composition-plan" value="composition-plan" checked>
+                                                <label class="form-check-label" for="composition-plan">
+                                                    <strong>Composition Plan</strong> - Advanced song structure
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="generation-method" 
+                                                       id="simple-prompt" value="simple-prompt">
+                                                <label class="form-check-label" for="simple-prompt">
+                                                    Simple Prompt - Quick generation
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Track Type</label>
+                                            <select class="form-control" id="music-style">
+                                                <option value="instrumental" selected>Instrumental Only</option>
+                                                <option value="with-vocals">Include Background Vocals</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Preview Settings</h6>
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle"></i>
+                                            <strong>Composition Plan Mode:</strong> Creates detailed song structure with timed sections matching your lyrics.
+                                        </div>
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <small>Music generation is powered by ElevenLabs and subject to their usage policies. Longer tracks use more credits.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-primary btn-lg" id="generate-music-btn">
+                                    <i class="fas fa-music"></i> Generate Advanced Music Track
+                                    <span class="spinner-border spinner-border-sm ms-2 loading"></span>
+                                </button>
+                                
+                                <div id="music-player" class="mt-3"></div>
+                                <div id="music-progress" class="mt-2"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Vocal Guide Generation -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-microphone"></i> Vocal Guide Generator</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    Generate a vocal guide to help with timing and pronunciation of your parody lyrics.
+                                </div>
+                                <button class="btn btn-secondary" id="generate-vocal-btn">
+                                    <i class="fas fa-microphone"></i> Generate Vocal Guide
+                                    <span class="spinner-border spinner-border-sm ms-2 loading"></span>
+                                </button>
+                                <div id="vocal-player" class="mt-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save Dialog -->
+        <div class="modal fade" id="save-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header gradient-bg">
+                        <h5 class="modal-title">Save Your Parody</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Project Name</label>
+                            <input type="text" class="form-control" id="project-name" 
+                                   placeholder="Give your parody a name...">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Genre</label>
+                            <select class="form-control" id="project-genre">
+                                <option value="comedy">Comedy</option>
+                                <option value="satirical">Satirical</option>
+                                <option value="educational">Educational</option>
+                                <option value="pop-culture">Pop Culture</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-success" id="confirm-save-btn">
+                            <i class="fas fa-save"></i> Save Project
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card card-hover">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-lightbulb"></i> Creative Tips</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Choosing Topics:</strong>
+                    <ul class="small">
+                        <li>Current events and trending topics</li>
+                        <li>Universal experiences (work, relationships)</li>
+                        <li>Pop culture references</li>
+                        <li>Technology frustrations</li>
+                    </ul>
+                </div>
+                <div class="mb-3">
+                    <strong>Writing Modes:</strong>
+                    <ul class="small">
+                        <li><strong>AI-Assisted:</strong> Get help generating lyrics automatically</li>
+                        <li><strong>Manual:</strong> Write your own with helpful tools</li>
+                        <li>Both modes analyze song structure first</li>
+                        <li>Switch before clicking "Analyze Song"</li>
+                    </ul>
+                </div>
+                <div class="mb-3">
+                    <strong>Writing Tips:</strong>
+                    <ul class="small">
+                        <li>Keep the original rhythm</li>
+                        <li>Match syllable counts</li>
+                        <li>Preserve the rhyme scheme</li>
+                        <li>Make it singable</li>
+                    </ul>
+                </div>
+                    <ul class="small">
+                        <li>Keep the original rhythm</li>
+                        <li>Match syllable counts</li>
+                        <li>Preserve the rhyme scheme</li>
+                        <li>Make it singable</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card card-hover mt-4">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-chart-line"></i> Progress</h5>
+            </div>
+            <div class="card-body">
+                <div class="progress mb-2">
+                    <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+                </div>
+                <small class="text-muted" id="progress-text">Ready to start!</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let songData = {
+    analysis: null,
+    projectSaved: false
+};
+
+$(document).ready(function() {
+    // Writing mode selection
+    $('input[name="writing-mode"]').change(function() {
+        const selectedMode = $(this).val();
+        if (selectedMode === 'ai') {
+            $('#ai-mode-content').show();
+            $('#manual-mode-content').hide();
+        } else {
+            $('#ai-mode-content').hide();
+            $('#manual-mode-content').show();
+        }
+    });
+    
+    // Step 1: Analyze song
+    $('#analyze-btn').click(function() {
+        const originalTitle = $('#original-title').val();
+        const originalArtist = $('#original-artist').val();
+        const originalLyrics = $('#original-lyrics').val();
+        const topic = $('#parody-topic').val();
+        
+        if (!originalTitle || !originalArtist || !originalLyrics || !topic) {
+            alert('Please fill in all fields');
+            return;
+        }
+        
+        updateProgress(25, 'Analyzing song structure...');
+        $(this).prop('disabled', true);
+        $(this).find('.loading').show();
+        
+        // Analyze song
+        $.ajax({
+            url: '/api/analyze',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                title: originalTitle,
+                artist: originalArtist,
+                lyrics: originalLyrics
+            }),
+            success: function(response) {
+                if (response.success) {
+                    songData.analysis = response.analysis;
+                    displayAnalysis(response.analysis);
+                    
+                    // Check writing mode and show appropriate content
+                    const writingMode = $('input[name="writing-mode"]:checked').val();
+                    if (writingMode === 'ai') {
+                        generateIdeas(response.analysis, topic);
+                        $('#ai-mode-content').show();
+                        $('#manual-mode-content').hide();
+                    } else {
+                        $('#ai-mode-content').hide();
+                        $('#manual-mode-content').show();
+                    }
+                    
+                    $('#step-2').removeClass('d-none');
+                } else {
+                    alert('Analysis failed: ' + response.error);
+                }
+            },
+            error: function() {
+                alert('Network error during analysis');
+            },
+            complete: function() {
+                $('#analyze-btn').prop('disabled', false).find('.loading').hide();
+            }
+        });
+    });
+    
+    // Step 2: Generate lyrics
+    $('#generate-lyrics-btn').click(function() {
+        const concept = $('#selected-concept').val();
+        if (!concept) {
+            alert('Please select or enter a parody concept');
+            return;
+        }
+        
+        updateProgress(50, 'Generating parody lyrics...');
+        $(this).prop('disabled', true);
+        
+        $.ajax({
+            url: '/api/generate_lyrics',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                original_lyrics: $('#original-lyrics').val(),
+                concept: concept,
+                rhyme_scheme: songData.analysis.rhyme_scheme || {},
+                preserve_structure: true
+            }),
+            success: function(response) {
+                if (response.success) {
+                    $('#parody-lyrics').val(response.lyrics);
+                    $('#original-lyrics-display').text($('#original-lyrics').val());
+                    $('#step-3').removeClass('d-none');
+                    
+                    // Set up AI mode UI
+                    $('#step3-title').text('Generated Lyrics');
+                    $('#ai-refinement-section').show();
+                    $('#manual-tools-section').hide();
+                    $('#manual-writing-helper').hide();
+                    
+                    updateProgress(75, 'Lyrics generated! Review and refine...');
+                } else {
+                    alert('Lyric generation failed: ' + response.error);
+                }
+            },
+            error: function() {
+                alert('Network error during lyric generation');
+            },
+            complete: function() {
+                $('#generate-lyrics-btn').prop('disabled', false);
+            }
+        });
+    });
+    
+    // Manual writing mode handler
+    $('#start-manual-writing-btn').click(function() {
+        const concept = $('#manual-concept').val();
+        if (!concept) {
+            alert('Please enter your parody concept');
+            return;
+        }
+        
+        // Set up manual writing mode
+        $('#step-3').removeClass('d-none');
+        $('#step3-title').text('Manual Lyrics Writing');
+        $('#original-lyrics-display').text($('#original-lyrics').val());
+        $('#parody-lyrics').attr('placeholder', 'Write your parody lyrics here...\n\nTip: Use the original lyrics as reference for rhythm and structure');
+        
+        // Show manual tools, hide AI refinement
+        $('#ai-refinement-section').hide();
+        $('#manual-tools-section').show();
+        $('#manual-writing-helper').show();
+        
+        updateProgress(50, 'Ready for manual writing! Use the tools below to help.');
+    });
+    
+    // Manual writing tools
+    $('#syllable-checker').click(function() {
+        const lyrics = $('#parody-lyrics').val();
+        if (!lyrics) {
+            alert('Please write some lyrics first');
+            return;
+        }
+        
+        // Simple syllable counting (basic implementation)
+        const lines = lyrics.split('\n');
+        let report = 'Syllable Count Report:\n\n';
+        lines.forEach((line, index) => {
+            if (line.trim()) {
+                const syllables = countSyllables(line);
+                report += `Line ${index + 1}: ${syllables} syllables - "${line}"\n`;
+            }
+        });
+        
+        alert(report);
+    });
+    
+    $('#rhyme-helper').click(function() {
+        const lyrics = $('#parody-lyrics').val();
+        if (!lyrics) {
+            alert('Please write some lyrics first');
+            return;
+        }
+        
+        // Basic rhyme analysis
+        const lines = lyrics.split('\n').filter(line => line.trim());
+        const lastWords = lines.map(line => {
+            const words = line.trim().split(' ');
+            return words[words.length - 1].toLowerCase().replace(/[^a-z]/g, '');
+        });
+        
+        let rhymeReport = 'Rhyme Pattern Analysis:\n\n';
+        lastWords.forEach((word, index) => {
+            rhymeReport += `Line ${index + 1}: "${word}"\n`;
+        });
+        
+        alert(rhymeReport);
+    });
+    
+    $('#structure-guide').click(function() {
+        if (!songData.analysis || !songData.analysis.structure) {
+            alert('No structure analysis available');
+            return;
+        }
+        
+        let guide = 'Song Structure Guide:\n\n';
+        songData.analysis.structure.forEach((section, index) => {
+            guide += `${index + 1}. ${section.toUpperCase()}\n`;
+        });
+        
+        guide += '\nTip: Write your parody following this same structure!';
+        alert(guide);
+    });
+    
+    $('#ai-assist-btn').click(function() {
+        const currentLyrics = $('#parody-lyrics').val();
+        const feedback = prompt('What would you like AI help with?', 'Improve this verse to be funnier');
+        
+        if (feedback && currentLyrics) {
+            $.ajax({
+                url: '/api/refine_lyrics',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    lyrics: currentLyrics,
+                    feedback: feedback
+                }),
+                success: function(response) {
+                    if (response.success) {
+                        $('#parody-lyrics').val(response.lyrics);
+                    } else {
+                        alert('AI assist failed: ' + response.error);
+                    }
+                }
+            });
+        }
+    });
+    
+    // Step 3: Refine lyrics (AI mode)
+    $('#refine-btn').click(function() {
+        const feedback = $('#refinement-feedback').val();
+        const currentLyrics = $('#parody-lyrics').val();
+        
+        if (!feedback) {
+            alert('Please enter refinement feedback');
+            return;
+        }
+        
+        $.ajax({
+            url: '/api/refine_lyrics',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                lyrics: currentLyrics,
+                feedback: feedback
+            }),
+            success: function(response) {
+                if (response.success) {
+                    $('#parody-lyrics').val(response.lyrics);
+                    $('#refinement-feedback').val('');
+                } else {
+                    alert('Refinement failed: ' + response.error);
+                }
+            }
+        });
+    });
+    
+    // Save project
+    $('#save-project-btn').click(function() {
+        $('#save-modal').modal('show');
+    });
+    
+    $('#confirm-save-btn').click(function() {
+        const projectName = $('#project-name').val();
+        const genre = $('#project-genre').val();
+        
+        if (!projectName) {
+            alert('Please enter a project name');
+            return;
+        }
+        
+        $.ajax({
+            url: '/api/save_project',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                project_name: projectName,
+                original_artist: $('#original-artist').val(),
+                original_title: $('#original-title').val(),
+                original_lyrics: $('#original-lyrics').val(),
+                parody_lyrics: $('#parody-lyrics').val(),
+                analysis: songData.analysis,
+                genre: genre
+            }),
+            success: function(response) {
+                if (response.success) {
+                    songData.projectSaved = true;
+                    $('#generate-audio-btn').prop('disabled', false);
+                    $('#save-modal').modal('hide');
+                    updateProgress(100, 'Project saved! Generate audio if desired.');
+                    alert('Project saved successfully!');
+                } else {
+                    alert('Save failed: ' + response.error);
+                }
+            }
+        });
+    });
+    
+    // Audio generation
+    $('#generate-audio-btn').click(function() {
+        $('#step-4').removeClass('d-none');
+    });
+    
+    // Advanced Music Generation Handler
+    $('#generate-music-btn').click(function() {
+        if (!songData.analysis) {
+            alert('Please analyze a song first');
+            return;
+        }
+        
+        const lyrics = $('#parody-lyrics').val();
+        if (!lyrics) {
+            alert('Please create lyrics first');
+            return;
+        }
+        
+        // Get advanced music options
+        const musicLength = $('#music-length').val();
+        const useCompositionPlan = $('#composition-plan').is(':checked');
+        const musicStyle = $('#music-style').val();
+        const includeVocals = musicStyle === 'with-vocals';
+        
+        $(this).prop('disabled', true);
+        $(this).find('.loading').show();
+        
+        // Show progress
+        $('#music-progress').html(`
+            <div class="alert alert-info">
+                <i class="fas fa-music"></i> 
+                ${useCompositionPlan ? 'Creating composition plan and generating' : 'Generating'} 
+                ${musicLength} second music track...
+                <div class="progress mt-2">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                         style="width: 100%"></div>
+                </div>
+            </div>
+        `);
+        
+        // Generate music with advanced options
+        $.ajax({
+            url: '/api/generate_music',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                song_structure: {
+                    title: songData.analysis.title || 'Parody Song',
+                    original_artist: songData.analysis.original_artist || 'Unknown',
+                    genre: songData.analysis.genre || 'pop',
+                    tempo: songData.analysis.tempo || 120,
+                    key: songData.analysis.key || 'C major',
+                    structure: songData.analysis.structure || ['intro', 'verse', 'chorus', 'verse', 'chorus', 'outro'],
+                    mood: songData.analysis.mood || ['upbeat'],
+                    instrumentation: songData.analysis.instrumentation || {'guitar': 'acoustic', 'drums': 'simple'}
+                },
+                lyrics: lyrics,
+                music_length: musicLength,
+                use_composition_plan: useCompositionPlan,
+                include_vocals: includeVocals,
+                music_style: musicStyle
+            }),
+            success: function(response) {
+                if (response.success) {
+                    displayMusicPlayer(response.download_url, response.duration, response.file_size);
+                    $('#music-progress').html(`
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i> 
+                            Music generated successfully! 
+                            (${(response.file_size / 1024).toFixed(1)}KB, ${response.duration}s)
+                            ${useCompositionPlan ? ' - Used advanced composition plan' : ''}
+                        </div>
+                    `);
+                } else {
+                    $('#music-progress').html(`
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            Music generation failed: ${response.error}
+                        </div>
+                    `);
+                }
+            },
+            error: function(xhr) {
+                let errorMsg = 'Network error';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMsg = xhr.responseJSON.error;
+                }
+                $('#music-progress').html(`
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Music generation failed: ${errorMsg}
+                    </div>
+                `);
+            },
+            complete: function() {
+                $('#generate-music-btn').prop('disabled', false);
+                $('#generate-music-btn').find('.loading').hide();
+            }
+        });
+    });
+    
+    function displayMusicPlayer(audioUrl, duration, fileSize) {
+        const playerHtml = `
+            <div class="card">
+                <div class="card-body">
+                    <h6><i class="fas fa-music"></i> Generated Music Track</h6>
+                    <audio controls style="width: 100%;" preload="metadata">
+                        <source src="${audioUrl}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            Duration: ${duration}s | Size: ${(fileSize / 1024).toFixed(1)}KB
+                        </small>
+                        <a href="${audioUrl}" class="btn btn-sm btn-outline-primary ms-2" download>
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+        $('#music-player').html(playerHtml);
+    }
+});
+
+function displayAnalysis(analysis) {
+    // Display song structure
+    let structureHtml = '<ul>';
+    if (analysis.structure) {
+        analysis.structure.forEach(section => {
+            structureHtml += `<li>${section}</li>`;
+        });
+    }
+    structureHtml += '</ul>';
+    $('#song-structure').html(structureHtml);
+    
+    // Display suggested themes
+    let themesHtml = '<ul>';
+    if (analysis.suggested_themes) {
+        analysis.suggested_themes.forEach(theme => {
+            themesHtml += `<li>${theme}</li>`;
+        });
+    }
+    themesHtml += '</ul>';
+    $('#suggested-themes').html(themesHtml);
+}
+
+function generateIdeas(analysis, topic) {
+    $.ajax({
+        url: '/api/generate_ideas',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            analysis: analysis,
+            topic: topic,
+            style: 'humorous'
+        }),
+        success: function(response) {
+            if (response.success) {
+                displayIdeas(response.ideas);
+            } else {
+                $('#parody-ideas').html('<div class="alert alert-warning">Could not generate ideas</div>');
+            }
+        },
+        error: function() {
+            $('#parody-ideas').html('<div class="alert alert-danger">Network error generating ideas</div>');
+        }
+    });
+}
+
+function displayIdeas(ideas) {
+    let html = '';
+    ideas.forEach((idea, index) => {
+        html += `
+            <div class="card mb-2">
+                <div class="card-body py-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="idea" value="${idea}" id="idea-${index}">
+                        <label class="form-check-label" for="idea-${index}">
+                            ${idea.substring(0, 200)}${idea.length > 200 ? '...' : ''}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    $('#parody-ideas').html(html);
+    $('#idea-selection').removeClass('d-none');
+    
+    // Handle idea selection
+    $('input[name="idea"]').change(function() {
+        $('#selected-concept').val($(this).val());
+    });
+}
+
+function updateProgress(percent, text) {
+    $('#progress-bar').css('width', percent + '%');
+    $('#progress-text').text(text);
+}
+
+// Simple syllable counting function
+function countSyllables(word) {
+    word = word.toLowerCase().replace(/[^a-z]/g, '');
+    if (word.length <= 3) return 1;
+    
+    word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
+    word = word.replace(/^y/, '');
+    
+    const matches = word.match(/[aeiouy]{1,2}/g);
+    return matches ? matches.length : 1;
+}
+</script>
+{% endblock %}
